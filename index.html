@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#c84b3e" />
+    <title>今晚吃什么</title>
+    <style>
+      :root {
+        --red: #c84b3e;
+        --tomato: #e5725d;
+        --yellow: #efb84a;
+        --green: #2f6556;
+        --ink: #1e332d;
+        --paper: #fff8e9;
+        --paper-deep: #f6ead0;
+        --line: rgba(30, 51, 45, 0.16);
+        font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        background: var(--paper);
+      }
+
+      button { font: inherit; }
+
+      .page {
+        display: grid;
+        min-height: 100vh;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 62px;
+        padding: 0 28px;
+        color: var(--paper);
+        background: var(--green);
+      }
+
+      .brand { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; }
+
+      .brand-mark {
+        display: grid;
+        width: 27px;
+        height: 27px;
+        place-items: center;
+        border: 2px solid currentColor;
+        border-radius: 50%;
+        font-size: 14px;
+        line-height: 1;
+      }
+
+      .topbar-note { margin: 0; color: rgba(255, 248, 233, 0.75); font-size: 13px; }
+
+      .app-shell {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        padding: 38px 20px 30px;
+        overflow: hidden;
+      }
+
+      .intro { max-width: 540px; margin: 0 0 25px; text-align: center; }
+      .intro p { margin: 0 0 7px; color: var(--red); font-size: 15px; font-weight: 800; }
+      h1 { margin: 0; font-size: clamp(30px, 6vw, 47px); font-weight: 900; line-height: 1.08; letter-spacing: 0; }
+      .intro .subcopy { margin: 12px 0 0; color: #60716a; font-size: 14px; font-weight: 500; }
+
+      .wheel-stage {
+        position: relative;
+        display: grid;
+        width: min(78vw, 510px);
+        min-width: 292px;
+        aspect-ratio: 1;
+        place-items: center;
+        --label-radius: clamp(92px, 29vw, 147px);
+      }
+
+      .wheel-frame {
+        position: relative;
+        width: 90%;
+        height: 90%;
+        padding: 10px;
+        border: 2px solid var(--ink);
+        border-radius: 50%;
+        background: var(--paper-deep);
+        box-shadow: 7px 8px 0 var(--ink);
+      }
+
+      .wheel-rotor {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        border: 2px solid var(--ink);
+        border-radius: 50%;
+        background: #d9d1b7;
+        transition: transform 5.2s cubic-bezier(.12, .82, .12, 1);
+        will-change: transform;
+      }
+
+      .wheel-rotor::after {
+        position: absolute;
+        inset: 0;
+        border: 1px solid rgba(255, 248, 233, 0.65);
+        border-radius: inherit;
+        content: "";
+        pointer-events: none;
+      }
+
+      .wheel-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        display: block;
+        width: min(16vw, 80px);
+        color: var(--paper);
+        font-size: clamp(11px, 2.5vw, 15px);
+        font-weight: 900;
+        letter-spacing: 0;
+        line-height: 1.18;
+        text-align: center;
+        text-shadow: 0 1px 0 rgba(30, 51, 45, 0.36);
+        transform-origin: center center;
+        user-select: none;
+      }
+
+      .wheel-label.is-dark { color: var(--ink); text-shadow: none; }
+
+      .hub {
+        position: absolute;
+        z-index: 2;
+        display: grid;
+        width: 30%;
+        min-width: 93px;
+        aspect-ratio: 1;
+        place-items: center;
+        padding: 9px;
+        color: var(--paper);
+        border: 2px solid var(--ink);
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 3px 4px 0 var(--ink);
+        cursor: pointer;
+        font-size: clamp(13px, 2.8vw, 17px);
+        font-weight: 900;
+        line-height: 1.1;
+        text-align: center;
+        transition: background .18s ease, transform .18s ease;
+      }
+
+      .hub:hover { background: #214c40; transform: translate(-1px, -1px); }
+      .hub:active { box-shadow: 1px 2px 0 var(--ink); transform: translate(2px, 2px); }
+      .hub:focus-visible, .action-button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; }
+      .hub:disabled { cursor: wait; opacity: .72; transform: none; }
+
+      .pointer {
+        position: absolute;
+        z-index: 4;
+        top: 0;
+        left: 50%;
+        width: 39px;
+        height: 51px;
+        transform: translateX(-50%);
+        filter: drop-shadow(2px 3px 0 var(--ink));
+      }
+
+      .pointer::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        border-top: 39px solid var(--red);
+        border-right: 19.5px solid transparent;
+        border-left: 19.5px solid transparent;
+        content: "";
+      }
+
+      .pointer::after {
+        position: absolute;
+        top: -3px;
+        left: 50%;
+        width: 11px;
+        height: 11px;
+        border: 2px solid var(--ink);
+        border-radius: 50%;
+        background: var(--yellow);
+        content: "";
+        transform: translateX(-50%);
+      }
+
+      .candidate-strip {
+        display: flex;
+        max-width: min(94vw, 760px);
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 7px 9px;
+        margin: 24px auto 0;
+      }
+
+      .candidate-strip span {
+        padding: 4px 8px;
+        color: #52615b;
+        border-bottom: 1px solid var(--line);
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .recording-tools {
+        display: flex;
+        max-width: min(94vw, 640px);
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 9px 11px;
+        margin: 20px auto 0;
+      }
+
+      .recording-status { min-width: 130px; color: #60716a; font-size: 12px; font-weight: 800; text-align: center; }
+      .recording-button { min-height: 38px; padding: 0 13px; color: var(--ink); border: 1px solid var(--ink); border-radius: 3px; background: transparent; cursor: pointer; font-size: 13px; font-weight: 900; }
+      .recording-button:hover { background: var(--paper-deep); }
+      .recording-button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+      .recording-button.primary { color: var(--paper); background: var(--red); box-shadow: 2px 2px 0 var(--ink); }
+      .recording-button.primary:hover { background: #a8382f; }
+      .recording-button:disabled { cursor: not-allowed; opacity: .55; }
+
+      .footer { padding: 15px 20px; border-top: 1px solid var(--line); color: #718079; font-size: 12px; text-align: center; }
+
+      dialog {
+        width: min(92vw, 410px);
+        padding: 0;
+        color: var(--ink);
+        border: 2px solid var(--ink);
+        border-radius: 6px;
+        background: var(--paper);
+        box-shadow: 8px 9px 0 var(--ink);
+      }
+
+      dialog::backdrop { background: rgba(30, 51, 45, .58); }
+      .result-card { padding: 28px; text-align: center; }
+      .result-card { position: relative; overflow: hidden; }
+      .result-token { display: grid; width: 46px; height: 46px; place-items: center; margin: 0 auto 15px; color: var(--paper); border: 2px solid var(--ink); border-radius: 50%; background: var(--red); box-shadow: 2px 3px 0 var(--ink); font-size: 22px; font-weight: 900; }
+      .result-card p { margin: 0; color: #66756e; font-size: 14px; font-weight: 800; }
+      .result-card h2 { margin: 8px 0 22px; color: var(--red); font-size: clamp(27px, 7vw, 38px); font-weight: 900; line-height: 1.1; letter-spacing: 0; overflow-wrap: anywhere; }
+      .action-button { min-height: 45px; padding: 0 22px; color: var(--paper); border: 2px solid var(--ink); border-radius: 3px; background: var(--green); box-shadow: 3px 3px 0 var(--ink); cursor: pointer; font-size: 15px; font-weight: 900; }
+      .action-button:hover { background: #214c40; }
+      .action-button:active { box-shadow: 1px 1px 0 var(--ink); transform: translate(2px, 2px); }
+
+      .celebration { position: absolute; inset: 0; display: none; overflow: hidden; pointer-events: none; }
+      .celebration i { position: absolute; width: 8px; height: 16px; background: var(--yellow); animation: confetti .9s cubic-bezier(.18, .85, .32, 1) both; }
+      .celebration i:nth-child(1) { top: 7%; left: 8%; background: var(--red); transform: rotate(20deg); }
+      .celebration i:nth-child(2) { top: 12%; left: 22%; background: var(--green); transform: rotate(62deg); animation-delay: .08s; }
+      .celebration i:nth-child(3) { top: 4%; left: 38%; background: var(--yellow); transform: rotate(10deg); animation-delay: .16s; }
+      .celebration i:nth-child(4) { top: 10%; left: 62%; background: var(--tomato); transform: rotate(71deg); animation-delay: .04s; }
+      .celebration i:nth-child(5) { top: 7%; left: 82%; background: var(--green); transform: rotate(31deg); animation-delay: .13s; }
+      .celebration i:nth-child(6) { top: 36%; left: 5%; background: var(--yellow); transform: rotate(83deg); animation-delay: .2s; }
+      .celebration i:nth-child(7) { top: 33%; right: 5%; background: var(--red); transform: rotate(15deg); animation-delay: .11s; }
+      .celebration i:nth-child(8) { right: 16%; bottom: 8%; background: var(--yellow); transform: rotate(37deg); animation-delay: .18s; }
+      .celebration i:nth-child(9) { right: 39%; bottom: 5%; background: var(--green); transform: rotate(75deg); animation-delay: .06s; }
+      .celebration i:nth-child(10) { bottom: 10%; left: 19%; background: var(--tomato); transform: rotate(23deg); animation-delay: .14s; }
+      dialog.is-jackpot { border-color: var(--red); box-shadow: 8px 9px 0 var(--red), 12px 13px 0 var(--ink); }
+      dialog.is-jackpot .result-card { background: var(--yellow); animation: prize-pulse .55s ease-in-out 2; }
+      dialog.is-jackpot .celebration { display: block; }
+      dialog.is-jackpot .result-token { color: var(--ink); background: var(--paper); animation: prize-token .7s cubic-bezier(.2, 1.25, .4, 1) both; }
+      dialog.is-jackpot .result-card p { color: var(--ink); }
+      dialog.is-jackpot .result-card h2 { color: var(--red); font-size: clamp(32px, 8vw, 46px); }
+      dialog.is-jackpot .action-button { color: var(--ink); background: var(--paper); }
+
+      @keyframes confetti { from { opacity: 0; } 55% { opacity: 1; transform: translateY(10px) rotate(185deg) scale(1.15); } to { opacity: 0; transform: translateY(55px) rotate(330deg) scale(.72); } }
+      @keyframes prize-pulse { 50% { transform: scale(1.035); } }
+      @keyframes prize-token { 0% { transform: scale(.25) rotate(-20deg); } 100% { transform: scale(1) rotate(0); } }
+
+      @media (max-width: 520px) {
+        .topbar { min-height: 56px; padding: 0 18px; }
+        .topbar-note { display: none; }
+        .app-shell { padding: 26px 10px 23px; }
+        .intro { margin-bottom: 20px; }
+        .wheel-stage { width: min(94vw, 430px); min-width: 0; }
+        .wheel-frame { box-shadow: 5px 6px 0 var(--ink); }
+        .wheel-label { width: 66px; font-size: 11px; }
+        .hub { min-width: 83px; }
+        .candidate-strip { margin-top: 18px; gap: 4px 7px; }
+        .candidate-strip span { padding: 3px 5px; font-size: 11px; }
+        .recording-tools { gap: 8px; margin-top: 16px; }
+        .recording-status { width: 100%; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark">食</span><span>晚餐决定局</span></div>
+        <p class="topbar-note">今晚不再纠结</p>
+      </header>
+
+      <main class="app-shell">
+        <section class="intro" aria-labelledby="pageTitle">
+          <p>今晚吃什么</p>
+          <h1 id="pageTitle">让转盘替你决定</h1>
+          <p class="subcopy" id="statusText">候选餐厅已就位，按下中间按钮</p>
+        </section>
+
+        <section class="wheel-stage" aria-label="晚餐选择转盘">
+          <div class="pointer" aria-hidden="true"></div>
+          <div class="wheel-frame">
+            <div class="wheel-rotor" id="wheel" role="img" aria-label="餐厅选择转盘"></div>
+          </div>
+          <button class="hub" id="spinButton" type="button">开始<br />决定</button>
+        </section>
+
+        <div class="candidate-strip" id="candidateStrip" aria-label="本次候选餐厅"></div>
+        <section class="recording-tools" aria-label="录制本局">
+          <span class="recording-status" id="recordingStatus" role="status">准备录制</span>
+          <button class="recording-button" id="chooseFolderButton" type="button">选择保存文件夹</button>
+          <button class="recording-button primary" id="recordButton" type="button">录制并转动</button>
+        </section>
+      </main>
+
+      <footer class="footer">所有候选项都在转盘上，今晚吃什么就此决定。</footer>
+    </div>
+
+    <dialog id="resultDialog" aria-labelledby="resultTitle">
+      <div class="result-card">
+        <div class="celebration" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="result-token" aria-hidden="true">!</div>
+        <p id="resultKicker">恭喜，今晚决定吃</p>
+        <h2 id="resultTitle"></h2>
+        <button class="action-button" id="againButton" type="button">再转一次</button>
+      </div>
+    </dialog>
+
+    <script src="wheel-logic.js"></script>
+    <script>
+      // 只需修改这个数组，即可替换转盘上的餐厅。
+      const restaurants = [
+        '烧腊饭', '莲藕汤饭', '汤粉炒粉', '木桶饭', '三餸饭', '螺蛳粉',
+        '云吞面', '闽南饭', '肠粉粥', '马来咖喱', '潮汕益母草汤',
+        'A必胜客/麦当劳', '不吃了', 'A鸡煲'
+      ];
+
+      const palette = ['#c84b3e', '#efb84a', '#2f6556', '#e5725d', '#d98f36', '#477b68'];
+      const darkSegments = new Set([1, 4, 7, 10]);
+      const wheel = document.getElementById('wheel');
+      const spinButton = document.getElementById('spinButton');
+      const statusText = document.getElementById('statusText');
+      const candidateStrip = document.getElementById('candidateStrip');
+      const resultDialog = document.getElementById('resultDialog');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultKicker = document.getElementById('resultKicker');
+      const resultToken = document.querySelector('.result-token');
+      const againButton = document.getElementById('againButton');
+      const chooseFolderButton = document.getElementById('chooseFolderButton');
+      const recordButton = document.getElementById('recordButton');
+      const recordingStatus = document.getElementById('recordingStatus');
+      const items = restaurants.map(WheelLogic.normalizeRestaurant).filter(Boolean);
+      const RESULT_RECORDING_TAIL_MS = 3000;
+      const recording = {
+        chunks: [],
+        directoryHandle: null,
+        isRecording: false,
+        mimeType: 'video/webm',
+        recorder: null,
+        stopTimer: null,
+        stream: null
+      };
+      let currentRotation = 0;
+      let settling = false;
+
+      function setRecordingStatus(message) {
+        recordingStatus.textContent = message;
+      }
+
+      function recordingMimeType() {
+        const types = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+        return types.find((type) => MediaRecorder.isTypeSupported(type)) || '';
+      }
+
+      function releaseRecordingStream() {
+        recording.stream?.getTracks().forEach((track) => track.stop());
+        recording.stream = null;
+      }
+
+      function downloadRecording(blob, fileName) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      }
+
+      async function saveRecording() {
+        const fileName = WheelLogic.recordingFileName(new Date());
+        const blob = new Blob(recording.chunks, { type: recording.mimeType });
+        try {
+          if (!recording.directoryHandle) throw new Error('No directory permission');
+          const fileHandle = await recording.directoryHandle.getFileHandle(fileName, { create: true });
+          const writable = await fileHandle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          setRecordingStatus(`已保存 ${fileName}`);
+        } catch (error) {
+          downloadRecording(blob, fileName);
+          setRecordingStatus(`已下载 ${fileName}`);
+        } finally {
+          recording.chunks = [];
+          recording.isRecording = false;
+          recording.recorder = null;
+          releaseRecordingStream();
+          chooseFolderButton.disabled = false;
+          recordButton.disabled = false;
+          recordButton.textContent = '录制并转动';
+        }
+      }
+
+      function stopRecording() {
+        window.clearTimeout(recording.stopTimer);
+        if (recording.recorder?.state === 'recording') {
+          setRecordingStatus('正在保存视频...');
+          recording.recorder.stop();
+        }
+      }
+
+      async function chooseRecordingFolder() {
+        if (!('showDirectoryPicker' in window)) {
+          setRecordingStatus('录制结束后将下载视频');
+          return;
+        }
+        try {
+          recording.directoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+          setRecordingStatus('保存文件夹已选定');
+        } catch (error) {
+          if (error.name !== 'AbortError') setRecordingStatus('文件夹不可用，录制后将下载');
+        }
+      }
+
+      async function recordAndSpin() {
+        if (recording.isRecording || settling) return;
+        if (!navigator.mediaDevices?.getDisplayMedia || !window.MediaRecorder) {
+          setRecordingStatus('当前浏览器不支持录屏');
+          return;
+        }
+        try {
+          setRecordingStatus('请选择当前标签页开始录制');
+          recording.stream = await navigator.mediaDevices.getDisplayMedia({
+            audio: false,
+            preferCurrentTab: true,
+            video: { displaySurface: 'browser' }
+          });
+          recording.mimeType = recordingMimeType() || 'video/webm';
+          recording.chunks = [];
+          recording.recorder = new MediaRecorder(
+            recording.stream,
+            recording.mimeType ? { mimeType: recording.mimeType } : undefined
+          );
+          recording.recorder.addEventListener('dataavailable', (event) => {
+            if (event.data.size) recording.chunks.push(event.data);
+          });
+          recording.recorder.addEventListener('stop', saveRecording, { once: true });
+          recording.stream.getVideoTracks()[0].addEventListener('ended', stopRecording, { once: true });
+          recording.recorder.start(250);
+          recording.isRecording = true;
+          chooseFolderButton.disabled = true;
+          recordButton.disabled = true;
+          recordButton.textContent = '录制中';
+          setRecordingStatus('录制中...');
+          if (!startSpin()) stopRecording();
+        } catch (error) {
+          releaseRecordingStream();
+          setRecordingStatus('录制已取消');
+        }
+      }
+
+      function renderCandidates() {
+        candidateStrip.replaceChildren(...items.map((item) => {
+          const label = document.createElement('span');
+          label.textContent = item.name;
+          return label;
+        }));
+      }
+
+      function renderWheel() {
+        if (!items.length) {
+          wheel.style.background = '#d9d1b7';
+          wheel.setAttribute('aria-label', '没有可选择的餐厅');
+          statusText.textContent = '请先在页面脚本的 restaurants 数组里加入餐厅。';
+          spinButton.disabled = true;
+          return;
+        }
+
+        const segmentAngle = 360 / items.length;
+        const gradient = items.map((_, index) => {
+          const start = index * segmentAngle;
+          const end = (index + 1) * segmentAngle;
+          return `${palette[index % palette.length]} ${start}deg ${end}deg`;
+        }).join(', ');
+        wheel.style.background = `conic-gradient(${gradient})`;
+        wheel.replaceChildren(...items.map((item, index) => {
+          const centerAngle = (index + .5) * segmentAngle;
+          const label = document.createElement('span');
+          label.className = `wheel-label${darkSegments.has(index % palette.length) ? ' is-dark' : ''}`;
+          label.textContent = item.name;
+          label.style.transform = `translate(-50%, -50%) rotate(${centerAngle}deg) translateY(calc(-1 * var(--label-radius))) rotate(${-centerAngle}deg)`;
+          return label;
+        }));
+        wheel.setAttribute('aria-label', `包含${items.map((item) => item.name).join('、')}的餐厅选择转盘`);
+      }
+
+      function showResult(choice) {
+        if (!settling) return;
+        settling = false;
+        resultTitle.textContent = choice.name;
+        resultKicker.textContent = choice.isPrize ? '今晚中大奖，安排高级餐！' : '恭喜，今晚决定吃';
+        resultToken.textContent = choice.isPrize ? '奖' : '!';
+        resultDialog.classList.toggle('is-jackpot', choice.isPrize);
+        statusText.textContent = choice.isPrize ? `中大奖！今晚安排${choice.name}。` : `今晚就吃${choice.name}。`;
+        spinButton.disabled = false;
+        if (typeof resultDialog.showModal === 'function') resultDialog.showModal();
+        if (recording.isRecording) {
+          setRecordingStatus('结果已揭晓，3 秒后结束录制');
+          recording.stopTimer = window.setTimeout(stopRecording, RESULT_RECORDING_TAIL_MS);
+        }
+      }
+
+      function startSpin() {
+        if (settling || !items.length) return false;
+        settling = true;
+        spinButton.disabled = true;
+        statusText.textContent = '正在替你认真决定...';
+        const chosenIndex = WheelLogic.chooseIndex(items.length);
+        currentRotation = WheelLogic.rotationForIndex(chosenIndex, items.length, currentRotation);
+        let fallbackTimer = window.setTimeout(() => showResult(items[chosenIndex]), 5700);
+        wheel.addEventListener('transitionend', (event) => {
+          if (event.propertyName !== 'transform') return;
+          window.clearTimeout(fallbackTimer);
+          showResult(items[chosenIndex]);
+        }, { once: true });
+        requestAnimationFrame(() => { wheel.style.transform = `rotate(${currentRotation}deg)`; });
+        return true;
+      }
+
+      spinButton.addEventListener('click', startSpin);
+      againButton.addEventListener('click', () => {
+        resultDialog.close();
+        startSpin();
+      });
+      chooseFolderButton.addEventListener('click', chooseRecordingFolder);
+      recordButton.addEventListener('click', recordAndSpin);
+
+      renderCandidates();
+      renderWheel();
+      if (!('showDirectoryPicker' in window)) chooseFolderButton.hidden = true;
+    </script>
+  </body>
+</html>
