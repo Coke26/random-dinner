@@ -3,7 +3,7 @@ window.RESTAURANT_DATA = {
     "近距离",
     "不吃饭（粥粉面）",
     "有空调",
-    "列1"
+    "高消费一把"
   ],
   "restaurants": [
     {
@@ -12,7 +12,7 @@ window.RESTAURANT_DATA = {
         "近距离": true,
         "不吃饭（粥粉面）": false,
         "有空调": true,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -21,7 +21,7 @@ window.RESTAURANT_DATA = {
         "近距离": false,
         "不吃饭（粥粉面）": false,
         "有空调": true,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -30,7 +30,7 @@ window.RESTAURANT_DATA = {
         "近距离": false,
         "不吃饭（粥粉面）": true,
         "有空调": true,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -39,7 +39,7 @@ window.RESTAURANT_DATA = {
         "近距离": false,
         "不吃饭（粥粉面）": false,
         "有空调": false,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -48,7 +48,7 @@ window.RESTAURANT_DATA = {
         "近距离": true,
         "不吃饭（粥粉面）": false,
         "有空调": false,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -57,7 +57,7 @@ window.RESTAURANT_DATA = {
         "近距离": false,
         "不吃饭（粥粉面）": true,
         "有空调": true,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -66,7 +66,7 @@ window.RESTAURANT_DATA = {
         "近距离": true,
         "不吃饭（粥粉面）": true,
         "有空调": true,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -75,7 +75,7 @@ window.RESTAURANT_DATA = {
         "近距离": false,
         "不吃饭（粥粉面）": false,
         "有空调": true,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -84,7 +84,7 @@ window.RESTAURANT_DATA = {
         "近距离": false,
         "不吃饭（粥粉面）": true,
         "有空调": false,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -93,7 +93,7 @@ window.RESTAURANT_DATA = {
         "近距离": true,
         "不吃饭（粥粉面）": false,
         "有空调": false,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -102,7 +102,7 @@ window.RESTAURANT_DATA = {
         "近距离": false,
         "不吃饭（粥粉面）": true,
         "有空调": true,
-        "列1": true
+        "高消费一把": true
       }
     },
     {
@@ -111,7 +111,7 @@ window.RESTAURANT_DATA = {
         "近距离": false,
         "不吃饭（粥粉面）": true,
         "有空调": false,
-        "列1": false
+        "高消费一把": false
       }
     },
     {
@@ -120,7 +120,7 @@ window.RESTAURANT_DATA = {
         "近距离": false,
         "不吃饭（粥粉面）": false,
         "有空调": false,
-        "列1": true
+        "高消费一把": true
       }
     },
     {
@@ -129,7 +129,16 @@ window.RESTAURANT_DATA = {
         "近距离": false,
         "不吃饭（粥粉面）": false,
         "有空调": false,
-        "列1": false
+        "高消费一把": false
+      }
+    },
+    {
+      "name": "醉润香",
+      "tags": {
+        "近距离": false,
+        "不吃饭（粥粉面）": false,
+        "有空调": true,
+        "高消费一把": false
       }
     }
   ]
